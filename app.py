@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import database as db
+import os
 from datetime import date, timedelta
 
 app = Flask(__name__)
@@ -125,4 +126,5 @@ def update_status():
     return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    port = int(os.environ.get('PORT', 8080))
+    app.run(debug=True, host='0.0.0.0', port=port)
