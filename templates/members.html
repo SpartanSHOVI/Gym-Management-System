@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Members{% endblock %}
+{% block page_title %}Member Directory{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('add_member') }}"
+   class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 shadow-sm transition-colors">
+    <i class="fas fa-plus mr-2"></i>Add Member
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+
+    <!-- Search / Filter bar -->
+    <form method="GET" action="{{ url_for('members') }}"
+          class="p-4 md:p-5 border-b border-gray-100 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        <div class="relative flex-1">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i class="fas fa-search text-gray-400 text-sm"></i>
+            </div>
+            <input type="text" name="q" value="{{ q }}" placeholder="Search name, phone or email…"
+                   class="pl-9 block w-full border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 py-2.5 transition-colors"
+                   aria-label="Search members">
+        </div>
+        <div class="flex gap-2 items-center">
+            <select name="status" onchange="this.form.submit()"
+                    class="border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 py-2.5 px-3 bg-white transition-colors"
+                    aria-label="Filter by status">
+                <option value="all" {% if status == 'all' %}selected{% endif %}>All Status</option>
+                <option value="Active" {% if status == 'Active' %}selected{% endif %}>Active</option>
+                <option value="Inactive" {% if status == 'Inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+            <button type="submit"
+                    class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                Search
+            </button>
+            {% if q or status != 'all' %}
+            <a href="{{ url_for('members') }}"
+               class="text-sm text-orange-500 hover:text-orange-600 font-medium whitespace-nowrap">
+                Clear
+            </a>
+            {% endif %}
+        </div>
+    </form>
+
+    <!-- ===== MOBILE: Card grid ===== -->
+    <div class="md:hidden">
+        {% for member in members %}
+        <div class="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+            <!-- Avatar -->
+            <div class="flex-shrink-0 h-10 w-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold border border-blue-200">
+                {{ member.name[0]|upper }}
+            </div>
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <a href="{{ url_for('member_detail', id=member.id) }}"
+                       class="text-sm font-semibold text-gray-900 hover:text-orange-600 transition-colors">{{ member.name }}</a>
+                    <span class="px-2 py-0.5 text-xs font-semibold rounded-full
+                        {% if member.status == 'Active' %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}">
+                        {{ member.status }}
+                    </span>
+                </div>
+                <p class="text-xs text-gray-400 mt-0.5">{{ member.phone or '—' }} &middot; {{ member.join_date|dateformat }}</p>
+            </div>
+            <!-- Actions -->
+            <div class="flex gap-1 flex-shrink-0">
+                <a href="{{ url_for('member_detail', id=member.id) }}"
+                   class="text-blue-500 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                   aria-label="View {{ member.name }}">
+                    <i class="fas fa-eye text-sm"></i>
+                </a>
+                <a href="{{ url_for('edit_member', id=member.id) }}"
+                   class="text-indigo-500 p-2 hover:bg-indigo-50 rounded-lg transition-colors"
+                   aria-label="Edit {{ member.name }}">
+                    <i class="fas fa-edit text-sm"></i>
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="px-4 py-12 text-center text-gray-400">
+            <i class="fas fa-users text-4xl text-gray-200 mb-4 block"></i>
+            <p class="text-base font-medium text-gray-900 mb-1">No members found</p>
+            {% if q or status != 'all' %}
+            <p class="text-sm mb-4">No members match your filters.</p>
+            <a href="{{ url_for('members') }}" class="text-orange-500 text-sm font-medium hover:underline">Clear filters</a>
+            {% else %}
+            <a href="{{ url_for('add_member') }}" class="inline-flex items-center mt-3 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400">
+                <i class="fas fa-plus mr-2"></i>Add Member
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- ===== DESKTOP: Table ===== -->
+    <div class="hidden md:block overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-100">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Join Date</th>
+                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                    <th scope="col" class="px-5 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-100">
+                {% for member in members %}
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-5 py-3.5 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div class="flex-shrink-0 h-9 w-9 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-700 font-bold text-sm border border-blue-200">
+                                {{ member.name[0]|upper }}
+                            </div>
+                            <div>
+                                <div class="text-sm font-semibold text-gray-900">{{ member.name }}</div>
+                                <div class="text-xs text-gray-400">#{{ "%04d"|format(member.id) }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600">{{ member.phone }}</td>
+                    <td class="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600">{{ member.join_date|dateformat }}</td>
+                    <td class="px-5 py-3.5 whitespace-nowrap text-center">
+                        <span class="px-2.5 py-1 inline-flex text-xs font-semibold rounded-full
+                            {% if member.status == 'Active' %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}">
+                            {{ member.status }}
+                        </span>
+                    </td>
+                    <td class="px-5 py-3.5 whitespace-nowrap text-right">
+                        <div class="flex justify-end gap-1">
+                            <a href="{{ url_for('member_detail', id=member.id) }}"
+                               class="text-blue-500 hover:text-blue-700 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                               aria-label="View {{ member.name }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('edit_member', id=member.id) }}"
+                               class="text-indigo-500 hover:text-indigo-700 p-1.5 hover:bg-indigo-50 rounded-lg transition-colors"
+                               aria-label="Edit {{ member.name }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="px-5 py-12 text-center text-gray-400 bg-gray-50">
+                        <i class="fas fa-users text-4xl text-gray-200 mb-4 block"></i>
+                        <p class="text-base font-medium text-gray-900 mb-1">No members found</p>
+                        {% if q or status != 'all' %}
+                        <p class="text-sm mb-4">No members match your filters.</p>
+                        <a href="{{ url_for('members') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50">
+                            Clear filters
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('add_member') }}" class="inline-flex items-center mt-3 px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400">
+                            <i class="fas fa-plus mr-2"></i>Add Member
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer: count + pagination -->
+    <div class="bg-gray-50 px-5 py-3 border-t border-gray-200">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <p class="text-sm text-gray-600">
+                Showing
+                <span class="font-medium">{{ ((page - 1) * per_page) + 1 if total > 0 else 0 }}</span>–<span class="font-medium">{{ [page * per_page, total] | min }}</span>
+                of <span class="font-medium">{{ total }}</span> member{{ 's' if total != 1 else '' }}
+            </p>
+
+            {% if total_pages > 1 %}
+            <nav class="flex items-center gap-1" aria-label="Pagination">
+                {% if page > 1 %}
+                <a href="{{ url_for('members', q=q, status=status, page=page-1) }}"
+                   class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                   aria-label="Previous">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </a>
+                {% else %}
+                <span class="px-3 py-1.5 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+                    <i class="fas fa-chevron-left text-xs"></i>
+                </span>
+                {% endif %}
+
+                {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <span class="px-3 py-1.5 text-sm font-semibold text-white bg-orange-500 border border-orange-500 rounded-lg" aria-current="page">{{ p }}</span>
+                    {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
+                    <a href="{{ url_for('members', q=q, status=status, page=p) }}"
+                       class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                       aria-label="Page {{ p }}">{{ p }}</a>
+                    {% elif p == page - 3 or p == page + 3 %}
+                    <span class="px-2 py-1.5 text-sm text-gray-400">…</span>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page < total_pages %}
+                <a href="{{ url_for('members', q=q, status=status, page=page+1) }}"
+                   class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                   aria-label="Next">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </a>
+                {% else %}
+                <span class="px-3 py-1.5 text-sm text-gray-300 bg-white border border-gray-200 rounded-lg cursor-not-allowed">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </span>
+                {% endif %}
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Member Profile{% endblock %}
+{% block page_title %}Member Profile{% endblock %}
+
+{% block page_actions %}
+<div class="flex flex-wrap gap-2">
+    {% if current_user_role in ['Admin', 'Owner'] %}
+    <a href="{{ url_for('members') }}"
+       class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+        <i class="fas fa-arrow-left mr-2"></i><span class="hidden sm:inline">Back to </span>List
+    </a>
+    <a href="{{ url_for('edit_member', id=member.id) }}"
+       class="inline-flex items-center px-3 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors">
+        <i class="fas fa-edit mr-2"></i>Edit
+    </a>
+    <form action="{{ url_for('archive_member', id=member.id) }}" method="POST"
+          onsubmit="return confirm('Archive this member? They will be marked Inactive and hidden from listings.')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit"
+                class="inline-flex items-center px-3 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition-colors">
+            <i class="fas fa-archive mr-2"></i>Archive
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    <!-- Profile Card -->
+    <div class="lg:col-span-1">
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+            <!-- Avatar header -->
+            <div class="px-6 py-7 text-center border-b border-gray-100 bg-gradient-to-b from-gray-50 to-white">
+                <div class="h-20 w-20 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 text-blue-700 border-2 border-blue-200 text-3xl font-bold flex items-center justify-center mx-auto mb-3">
+                    {{ member.name[0]|upper }}
+                </div>
+                <h2 class="text-lg font-bold text-gray-900">{{ member.name }}</h2>
+                <p class="text-sm text-gray-400 mb-3">ID: #{{ "%04d"|format(member.id) }}</p>
+                <span class="px-3 py-1 inline-flex text-sm font-semibold rounded-full
+                             {% if member.status == 'Active' %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}">
+                    {{ member.status }}
+                </span>
+            </div>
+
+            <!-- Contact -->
+            <div class="px-5 py-5 border-b border-gray-100">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Contact Information</p>
+                <div class="space-y-2.5">
+                    <div class="flex items-center gap-2.5 text-sm text-gray-700">
+                        <i class="fas fa-phone text-gray-400 w-4 text-center"></i>
+                        <span>{{ member.phone or '—' }}</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 text-sm text-gray-700">
+                        <i class="fas fa-envelope text-gray-400 w-4 text-center"></i>
+                        <span class="truncate">{{ member.email or '—' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membership info -->
+            <div class="px-5 py-5">
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Membership Info</p>
+                <div class="flex items-center gap-2.5 text-sm text-gray-700">
+                    <i class="fas fa-calendar-alt text-gray-400 w-4 text-center"></i>
+                    <span>Joined {{ member.join_date|dateformat }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: subscriptions -->
+    <div class="lg:col-span-2 space-y-5">
+
+        <!-- Current / Latest plan status -->
+        {% if subscriptions %}
+            {% set latest_sub = subscriptions[0] %}
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden relative">
+                <div class="absolute top-0 left-0 w-1 h-full {% if member.status == 'Active' %}bg-emerald-500{% else %}bg-red-500{% endif %}"></div>
+                <div class="p-5">
+                    <div class="flex justify-between items-start mb-4 gap-3">
+                        <div>
+                            <h3 class="text-base font-bold text-gray-900">Current Plan</h3>
+                            <p class="text-sm text-gray-500">{{ latest_sub.plan_name }}</p>
+                        </div>
+                        {% if current_user_role in ['Admin', 'Owner'] %}
+                        <a href="{{ url_for('assign_plan', member_id=member.id) }}"
+                           class="flex-shrink-0 text-sm bg-orange-50 text-orange-600 hover:bg-orange-100 font-semibold px-3 py-1.5 rounded-lg transition-colors border border-orange-200">
+                            Renew / Assign
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1 uppercase font-semibold tracking-wider">Start Date</p>
+                            <p class="font-semibold text-gray-900 text-sm">{{ latest_sub.start_date|dateformat }}</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                            <p class="text-xs text-gray-500 mb-1 uppercase font-semibold tracking-wider">End Date</p>
+                            <p class="font-semibold text-sm {% if member.status != 'Active' %}text-red-600{% else %}text-gray-900{% endif %}">
+                                {{ latest_sub.end_date|dateformat }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                <div class="p-6 text-center">
+                    <i class="fas fa-file-signature text-4xl text-gray-200 mb-3 block"></i>
+                    <h3 class="text-base font-semibold text-gray-900 mb-1">No Active Plans</h3>
+                    <p class="text-sm text-gray-500 mb-4">This member doesn't have any subscription history.</p>
+                    {% if current_user_role in ['Admin', 'Owner'] %}
+                    <a href="{{ url_for('assign_plan', member_id=member.id) }}"
+                       class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 transition-colors">
+                        Assign First Plan
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Subscription History -->
+        <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-100">
+                <h3 class="text-base font-bold text-gray-900">Subscription History</h3>
+            </div>
+
+            <!-- Mobile: cards -->
+            <div class="md:hidden divide-y divide-gray-100">
+                {% for sub in subscriptions %}
+                <div class="px-4 py-3.5 {% if loop.first %}bg-blue-50/40{% endif %}">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-semibold text-gray-900">{{ sub.plan_name }}</p>
+                                {% if loop.first %}
+                                <span class="px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">Latest</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ sub.start_date|dateformat }} &rarr; {{ sub.end_date|dateformat }}</p>
+                        </div>
+                        <span class="text-sm font-bold text-gray-700 ml-3">${{ "%.2f"|format(sub.price) }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="px-4 py-8 text-center text-gray-400 text-sm">No subscription history available.</div>
+                {% endfor %}
+            </div>
+
+            <!-- Desktop: table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-100">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Plan</th>
+                            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
+                            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Start Date</th>
+                            <th scope="col" class="px-5 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">End Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        {% for sub in subscriptions %}
+                        <tr class="hover:bg-gray-50 transition-colors {% if loop.first %}bg-blue-50/30{% endif %}">
+                            <td class="px-5 py-3.5 text-sm font-medium text-gray-900">
+                                {{ sub.plan_name }}
+                                {% if loop.first %}
+                                <span class="ml-1.5 px-1.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">Latest</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-3.5 text-sm text-gray-500">${{ "%.2f"|format(sub.price) }}</td>
+                            <td class="px-5 py-3.5 text-sm text-gray-500">{{ sub.start_date|dateformat }}</td>
+                            <td class="px-5 py-3.5 text-sm text-gray-500">{{ sub.end_date|dateformat }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="px-5 py-8 text-center text-gray-400 text-sm">No subscription history available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

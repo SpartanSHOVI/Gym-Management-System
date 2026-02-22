@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 — Server Error</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="text-center max-w-md">
+
+        <!-- Brand -->
+        <a href="/" class="inline-flex items-center gap-3 mb-10 group">
+            <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg">
+                <i class="fas fa-dumbbell text-white"></i>
+            </div>
+            <span class="text-2xl font-black tracking-widest text-white uppercase">Olympia</span>
+        </a>
+
+        <!-- 500 -->
+        <div class="text-8xl font-extrabold text-white/10 mb-2 select-none leading-none">500</div>
+        <i class="fas fa-exclamation-triangle text-5xl text-red-400 mb-5 block"></i>
+
+        <h1 class="text-2xl font-bold text-white mb-3">Something Went Wrong</h1>
+        <p class="text-gray-400 mb-8 leading-relaxed">
+            An unexpected error occurred on the server. Please try again in a moment.
+            If the problem persists, contact your system administrator.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/dashboard"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 transition-colors shadow-lg">
+                <i class="fas fa-home"></i> Go to Dashboard
+            </a>
+            <a href="/"
+               class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-gray-300 border border-white/10 hover:bg-white/5 transition-colors">
+                <i class="fas fa-globe"></i> Homepage
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Plans{% endblock %}
+{% block page_title %}Membership Plans{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('add_plan') }}"
+   class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 shadow-sm transition-colors">
+    <i class="fas fa-plus mr-2"></i>Create Plan
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+    {% for plan in plans %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 hover:border-orange-400 hover:shadow-md transition-all group overflow-hidden flex flex-col">
+
+        <!-- Top color bar -->
+        <div class="h-1 bg-gradient-to-r from-orange-400 to-orange-600 group-hover:h-1.5 transition-all"></div>
+
+        <!-- Header -->
+        <div class="px-5 pt-5 pb-3 flex justify-between items-start">
+            <h3 class="text-lg font-bold text-gray-900 leading-tight">{{ plan.name }}</h3>
+            <span class="ml-2 flex-shrink-0 px-2.5 py-1 text-xs font-bold text-orange-600 bg-orange-50 border border-orange-200 rounded-full">
+                {{ plan.duration_days }}d
+            </span>
+        </div>
+
+        <!-- Price + description -->
+        <div class="px-5 pb-4 flex-1 flex flex-col">
+            <div class="mb-3">
+                <span class="text-3xl font-extrabold text-gray-900">${{ "%.2f"|format(plan.price) }}</span>
+            </div>
+            {% if plan.description %}
+            <p class="text-sm text-gray-500 leading-relaxed">{{ plan.description }}</p>
+            {% else %}
+            <p class="text-sm text-gray-400 italic">Valid for {{ plan.duration_days }} days of gym access.</p>
+            {% endif %}
+        </div>
+
+        <!-- Actions -->
+        <div class="px-5 pb-5 grid grid-cols-2 gap-2.5 border-t border-gray-100 pt-4">
+            <a href="{{ url_for('edit_plan', id=plan.id) }}"
+               class="inline-flex items-center justify-center px-3 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <i class="fas fa-edit mr-1.5 text-gray-400"></i>Edit
+            </a>
+            <form action="{{ url_for('delete_plan', id=plan.id) }}" method="POST"
+                  onsubmit="return confirm('Delete plan \'{{ plan.name }}\'? This cannot be undone.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                        class="w-full inline-flex items-center justify-center px-3 py-2 border border-red-200 rounded-lg text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors"
+                        aria-label="Delete {{ plan.name }}">
+                    <i class="fas fa-trash-alt mr-1.5"></i>Delete
+                </button>
+            </form>
+        </div>
+
+    </div>
+    {% else %}
+    <div class="col-span-full bg-white shadow-sm rounded-xl border border-gray-200 p-12 text-center">
+        <i class="fas fa-tags text-5xl text-gray-200 mb-4 block"></i>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No Plans Created</h3>
+        <p class="text-sm text-gray-500 mb-6">Create membership plans to allow members to subscribe.</p>
+        <a href="{{ url_for('add_plan') }}"
+           class="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 transition-colors">
+            <i class="fas fa-plus mr-2"></i>Create First Plan
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

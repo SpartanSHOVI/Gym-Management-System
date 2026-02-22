@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Olympia Gym — Forge your body, sharpen your mind. World-class facilities and expert coaching.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+    <title>Olympia Gym — Forge Your Legend</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
+
+        /* Hero gradient overlay */
+        .hero-overlay {
+            background: linear-gradient(135deg,
+                rgba(0,0,0,0.85) 0%,
+                rgba(15,23,42,0.7) 50%,
+                rgba(30,58,138,0.5) 100%);
+        }
+
+        /* Animated gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Card glow on hover */
+        .card-glow {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-glow:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 60px -10px rgba(59, 130, 246, 0.3);
+        }
+
+        /* Stat counter pulse */
+        .stat-ring {
+            background: conic-gradient(#3b82f6 0%, #1d4ed8 100%);
+        }
+
+        /* Feature icon shimmer */
+        .icon-box {
+            position: relative;
+            overflow: hidden;
+        }
+        .icon-box::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%);
+            transform: rotate(0deg);
+            transition: transform 0.6s ease;
+        }
+        .icon-box:hover::after {
+            transform: rotate(180deg);
+        }
+
+        /* Navbar scroll shadow */
+        .nav-scrolled {
+            background: rgba(2, 6, 23, 0.95) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        /* Plan popular badge pulse */
+        @keyframes badge-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+        }
+        .badge-pulse { animation: badge-pulse 2s infinite; }
+
+        /* Floating shapes */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-20px) rotate(5deg); }
+            66% { transform: translateY(-10px) rotate(-5deg); }
+        }
+        .float-1 { animation: float 8s ease-in-out infinite; }
+        .float-2 { animation: float 10s ease-in-out infinite 2s; }
+        .float-3 { animation: float 12s ease-in-out infinite 4s; }
+
+        /* Section fade-in on scroll */
+        .fade-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        .fade-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Testimonial quote mark */
+        .quote-mark {
+            font-size: 5rem;
+            line-height: 1;
+            color: rgba(59,130,246,0.2);
+            font-family: Georgia, serif;
+            position: absolute;
+            top: -10px;
+            left: 16px;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white" x-data="{ mobileOpen: false, scrolled: false }"
+      @scroll.window="scrolled = window.scrollY > 60">
+
+<!-- ═══════════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════════ -->
+<nav class="fixed top-0 inset-x-0 z-50 transition-all duration-300"
+     :class="scrolled ? 'nav-scrolled' : 'bg-transparent'">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-2 group">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/50">
+                    <i class="fas fa-dumbbell text-white text-base"></i>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight">
+                    <span class="text-white">Olympia</span><span class="text-blue-400">Gym</span>
+                </span>
+            </a>
+
+            <!-- Desktop nav -->
+            <div class="hidden md:flex items-center space-x-1">
+                <a href="#features" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Features</a>
+                <a href="#plans" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Membership</a>
+                <a href="#testimonials" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Reviews</a>
+                <a href="#contact" class="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Contact</a>
+            </div>
+
+            <!-- CTA -->
+            <div class="hidden md:flex items-center space-x-3">
+                <a href="{{ url_for('login') }}"
+                   class="px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors">
+                    Member Login
+                </a>
+                <a href="#plans"
+                   class="px-5 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-lg shadow-blue-900/40 transition-all hover:shadow-blue-700/40">
+                    Join Now
+                </a>
+            </div>
+
+            <!-- Mobile hamburger -->
+            <button @click="mobileOpen = !mobileOpen"
+                    class="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                    aria-label="Toggle navigation">
+                <i class="fas fa-bars text-lg" x-show="!mobileOpen"></i>
+                <i class="fas fa-times text-lg" x-show="mobileOpen" x-cloak></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div x-show="mobileOpen" x-cloak
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-2"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-2"
+         class="md:hidden bg-gray-950/95 backdrop-blur-md border-t border-white/5 px-4 pb-4 pt-2 space-y-1">
+        <a href="#features" @click="mobileOpen=false" class="block px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Features</a>
+        <a href="#plans" @click="mobileOpen=false" class="block px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Membership</a>
+        <a href="#testimonials" @click="mobileOpen=false" class="block px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Reviews</a>
+        <a href="#contact" @click="mobileOpen=false" class="block px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white rounded-lg hover:bg-white/5 transition-colors">Contact</a>
+        <hr class="border-white/10 my-2">
+        <a href="{{ url_for('login') }}" class="block px-4 py-2.5 text-sm font-medium text-blue-400 hover:text-blue-300 rounded-lg hover:bg-white/5 transition-colors">Member Login</a>
+        <a href="#plans" @click="mobileOpen=false" class="block px-4 py-2.5 text-sm font-semibold text-center text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors">Join Now</a>
+    </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════ -->
+<section id="hero" class="relative min-h-screen flex items-center overflow-hidden">
+
+    <!-- Background — dark gym aesthetic with grid pattern -->
+    <div class="absolute inset-0 bg-gray-950"></div>
+    <div class="absolute inset-0 opacity-10"
+         style="background-image: linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px);
+                background-size: 60px 60px;">
+    </div>
+
+    <!-- Radial glow -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] rounded-full opacity-20"
+         style="background: radial-gradient(circle, #1d4ed8 0%, transparent 70%);"></div>
+    <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full opacity-10"
+         style="background: radial-gradient(circle, #7c3aed 0%, transparent 70%);"></div>
+
+    <!-- Floating decorative elements -->
+    <div class="absolute top-32 right-[10%] w-16 h-16 rounded-xl bg-blue-600/10 border border-blue-500/20 float-1 hidden lg:flex items-center justify-center">
+        <i class="fas fa-fire text-blue-400 text-2xl"></i>
+    </div>
+    <div class="absolute top-1/2 right-[6%] w-12 h-12 rounded-full bg-purple-600/10 border border-purple-500/20 float-2 hidden lg:flex items-center justify-center">
+        <i class="fas fa-bolt text-purple-400"></i>
+    </div>
+    <div class="absolute bottom-32 right-[15%] w-14 h-14 rounded-xl bg-blue-600/10 border border-blue-500/20 float-3 hidden lg:flex items-center justify-center">
+        <i class="fas fa-medal text-blue-400 text-xl"></i>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 lg:py-0">
+        <div class="max-w-3xl">
+            <!-- Badge -->
+            <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-950/80 border border-blue-700/40 text-blue-300 text-xs font-semibold tracking-widest uppercase mb-6 shadow-lg">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
+                Now accepting new members
+            </div>
+
+            <!-- Headline -->
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+                Forge Your<br>
+                <span class="gradient-text">Legend</span><br>
+                <span class="text-white/90">at Olympia</span>
+            </h1>
+
+            <!-- Sub-headline -->
+            <p class="text-lg sm:text-xl text-gray-400 leading-relaxed max-w-xl mb-10">
+                World-class equipment, elite coaching, and a community that pushes
+                you further than you thought possible. Your transformation starts today.
+            </p>
+
+            <!-- CTAs -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="#plans"
+                   class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl shadow-2xl shadow-blue-900/50 transition-all hover:-translate-y-0.5 hover:shadow-blue-700/50">
+                    <i class="fas fa-dumbbell mr-2.5"></i>
+                    Start Your Journey
+                </a>
+                <a href="#features"
+                   class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-300 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all hover:-translate-y-0.5">
+                    <i class="fas fa-play-circle mr-2.5 text-blue-400"></i>
+                    Discover More
+                </a>
+            </div>
+
+            <!-- Trust badges -->
+            <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div class="flex items-center text-gray-500 text-sm">
+                    <i class="fas fa-check-circle text-green-500 mr-1.5"></i>
+                    No joining fee
+                </div>
+                <div class="flex items-center text-gray-500 text-sm">
+                    <i class="fas fa-check-circle text-green-500 mr-1.5"></i>
+                    Cancel anytime
+                </div>
+                <div class="flex items-center text-gray-500 text-sm">
+                    <i class="fas fa-check-circle text-green-500 mr-1.5"></i>
+                    Open 24 / 7
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-600 animate-bounce">
+        <span class="text-xs tracking-widest uppercase">Scroll</span>
+        <i class="fas fa-chevron-down text-xs"></i>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     STATS STRIP
+═══════════════════════════════════════════════════ -->
+<section class="border-y border-white/5 bg-gray-900/60 backdrop-blur-sm fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-0 lg:divide-x lg:divide-white/10">
+
+            <div class="flex flex-col items-center lg:items-start lg:px-10 text-center lg:text-left">
+                <span class="text-4xl font-black text-white">1,200<span class="text-blue-400">+</span></span>
+                <span class="text-sm text-gray-400 mt-1 font-medium">Active Members</span>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start lg:px-10 text-center lg:text-left">
+                <span class="text-4xl font-black text-white">15<span class="text-blue-400">+</span></span>
+                <span class="text-sm text-gray-400 mt-1 font-medium">Expert Trainers</span>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start lg:px-10 text-center lg:text-left">
+                <span class="text-4xl font-black text-white">50<span class="text-blue-400">+</span></span>
+                <span class="text-sm text-gray-400 mt-1 font-medium">Weekly Classes</span>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-start lg:px-10 text-center lg:text-left">
+                <span class="text-4xl font-black text-white">8<span class="text-blue-400"> yrs</span></span>
+                <span class="text-sm text-gray-400 mt-1 font-medium">In the Community</span>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FEATURES
+═══════════════════════════════════════════════════ -->
+<section id="features" class="py-24 lg:py-32 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Section heading -->
+        <div class="text-center mb-16">
+            <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-blue-400 bg-blue-950/60 border border-blue-800/40 rounded-full mb-4">Why Olympia</span>
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-4">Everything You Need<br>to <span class="gradient-text">Dominate</span></h2>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">We've built every aspect of Olympia around a single goal: your results.</p>
+        </div>
+
+        <!-- Features grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-blue-950/80 border border-blue-800/40 flex items-center justify-center mb-5 group-hover:bg-blue-900/60 transition-colors">
+                    <i class="fas fa-dumbbell text-blue-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Premium Equipment</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Over 200 pieces of cutting-edge strength and cardio equipment, regularly maintained and updated.</p>
+            </div>
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-purple-950/80 border border-purple-800/40 flex items-center justify-center mb-5 group-hover:bg-purple-900/60 transition-colors">
+                    <i class="fas fa-user-shield text-purple-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Personal Coaching</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Certified trainers design custom programs and provide 1-on-1 guidance to accelerate your progress.</p>
+            </div>
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-emerald-950/80 border border-emerald-800/40 flex items-center justify-center mb-5 group-hover:bg-emerald-900/60 transition-colors">
+                    <i class="fas fa-heartbeat text-emerald-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Group Classes</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">HIIT, yoga, spin, boxing and more — 50+ classes per week to keep your training fresh and motivating.</p>
+            </div>
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-amber-950/80 border border-amber-800/40 flex items-center justify-center mb-5 group-hover:bg-amber-900/60 transition-colors">
+                    <i class="fas fa-moon text-amber-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Open 24 / 7</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Early bird or night owl — the gym is always open. Secure keycard access means you train on your schedule.</p>
+            </div>
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-rose-950/80 border border-rose-800/40 flex items-center justify-center mb-5 group-hover:bg-rose-900/60 transition-colors">
+                    <i class="fas fa-apple-alt text-rose-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Nutrition Guidance</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">In-house nutritionist consultations and meal planning support to complement your training regimen.</p>
+            </div>
+
+            <div class="card-glow bg-gray-900/80 border border-white/5 rounded-2xl p-7 group">
+                <div class="icon-box w-14 h-14 rounded-xl bg-cyan-950/80 border border-cyan-800/40 flex items-center justify-center mb-5 group-hover:bg-cyan-900/60 transition-colors">
+                    <i class="fas fa-mobile-alt text-cyan-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-2">Member Portal</h3>
+                <p class="text-gray-400 text-sm leading-relaxed">Track your active membership, view subscription history, and manage your profile from any device.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SHOWCASE / EXPERIENCE STRIP
+═══════════════════════════════════════════════════ -->
+<section class="py-20 bg-gradient-to-r from-blue-950/40 via-gray-900/60 to-purple-950/40 border-y border-white/5 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Left — text -->
+            <div>
+                <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-purple-400 bg-purple-950/60 border border-purple-800/40 rounded-full mb-5">The Experience</span>
+                <h2 class="text-4xl lg:text-5xl font-black text-white mb-6">
+                    More Than a Gym.<br>
+                    <span class="gradient-text">A Community.</span>
+                </h2>
+                <p class="text-gray-400 text-lg leading-relaxed mb-8">
+                    At Olympia, we believe transformation is a team sport. From your first session 
+                    to your hundredth, our coaches and fellow members are with you every rep of the way.
+                </p>
+
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 w-8 h-8 rounded-lg bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-check text-blue-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-0.5">Structured progression</h4>
+                            <p class="text-gray-500 text-sm">Science-backed programming that ensures you improve every single week.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 w-8 h-8 rounded-lg bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-check text-blue-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-0.5">Accountability system</h4>
+                            <p class="text-gray-500 text-sm">Regular check-ins and progress reviews keep you on track and motivated.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 w-8 h-8 rounded-lg bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-check text-blue-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-semibold mb-0.5">Premium recovery zone</h4>
+                            <p class="text-gray-500 text-sm">Sauna, cold plunge, foam-rolling area, and stretching studio all included.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right — visual stats card -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-900/80 border border-white/5 rounded-2xl p-6 text-center card-glow">
+                    <div class="text-5xl font-black text-white mb-1">98<span class="text-blue-400 text-3xl">%</span></div>
+                    <p class="text-gray-400 text-sm font-medium">Member satisfaction</p>
+                </div>
+                <div class="bg-gray-900/80 border border-white/5 rounded-2xl p-6 text-center card-glow mt-6">
+                    <div class="text-5xl font-black text-white mb-1">4.9<span class="text-yellow-400 text-3xl">★</span></div>
+                    <p class="text-gray-400 text-sm font-medium">Average rating</p>
+                </div>
+                <div class="bg-blue-950/60 border border-blue-800/30 rounded-2xl p-6 text-center card-glow">
+                    <div class="text-5xl font-black text-white mb-1">3<span class="text-blue-400 text-3xl">×</span></div>
+                    <p class="text-gray-400 text-sm font-medium">Certified coaches</p>
+                </div>
+                <div class="bg-gray-900/80 border border-white/5 rounded-2xl p-6 text-center card-glow mt-6">
+                    <div class="text-5xl font-black text-white mb-1">24<span class="text-purple-400 text-2xl">/7</span></div>
+                    <p class="text-gray-400 text-sm font-medium">Always open</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MEMBERSHIP PLANS
+═══════════════════════════════════════════════════ -->
+<section id="plans" class="py-24 lg:py-32 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Heading -->
+        <div class="text-center mb-16">
+            <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-blue-400 bg-blue-950/60 border border-blue-800/40 rounded-full mb-4">Membership</span>
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-4">
+                Simple, Transparent<br><span class="gradient-text">Pricing</span>
+            </h2>
+            <p class="text-gray-400 text-lg max-w-xl mx-auto">Choose the plan that fits your goals. No hidden fees, no surprises.</p>
+        </div>
+
+        {% if plans %}
+        <div class="grid grid-cols-1 md:grid-cols-{{ [plans|length, 3]|min }} gap-6 max-w-5xl mx-auto">
+            {% for plan in plans %}
+            {% set is_popular = loop.index == 2 or (plans|length == 1) %}
+            <div class="relative card-glow rounded-2xl
+                        {% if is_popular %}
+                            bg-gradient-to-b from-blue-900/60 to-gray-900/90 border border-blue-600/40
+                        {% else %}
+                            bg-gray-900/80 border border-white/5
+                        {% endif %}
+                        overflow-hidden">
+
+                {% if is_popular %}
+                <div class="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+                <div class="absolute top-4 right-4">
+                    <span class="badge-pulse inline-block px-3 py-1 text-xs font-bold text-white bg-blue-600 rounded-full">
+                        Most Popular
+                    </span>
+                </div>
+                {% endif %}
+
+                <div class="p-8">
+                    <!-- Plan name -->
+                    <h3 class="text-xl font-bold text-white mb-1">{{ plan.name }}</h3>
+
+                    {% if plan.description %}
+                    <p class="text-gray-400 text-sm mb-6">{{ plan.description }}</p>
+                    {% else %}
+                    <p class="text-gray-400 text-sm mb-6">Full gym access — all equipment, classes &amp; facilities included.</p>
+                    {% endif %}
+
+                    <!-- Price -->
+                    <div class="mb-6">
+                        <div class="flex items-end gap-1">
+                            <span class="text-gray-400 text-lg font-medium self-start mt-2">$</span>
+                            <span class="text-6xl font-black {% if is_popular %}text-blue-300{% else %}text-white{% endif %} leading-none">
+                                {{ '%g' % plan.price }}
+                            </span>
+                        </div>
+                        <p class="text-gray-500 text-sm mt-1">for {{ plan.duration_days }} days</p>
+                    </div>
+
+                    <!-- Feature list -->
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            Unlimited gym access
+                        </li>
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            All group classes included
+                        </li>
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            Locker room &amp; showers
+                        </li>
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            Member portal access
+                        </li>
+                        {% if plan.duration_days >= 90 %}
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            1 free PT session / month
+                        </li>
+                        {% endif %}
+                        {% if plan.duration_days >= 365 %}
+                        <li class="flex items-center gap-2.5 text-sm text-gray-300">
+                            <i class="fas fa-check-circle {% if is_popular %}text-blue-400{% else %}text-emerald-400{% endif %} flex-shrink-0"></i>
+                            Nutrition consultation
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <a href="{{ url_for('login') }}"
+                       class="block text-center py-3.5 px-6 rounded-xl text-sm font-bold transition-all
+                              {% if is_popular %}
+                                  bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/50 hover:-translate-y-0.5
+                              {% else %}
+                                  bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-gray-200 hover:-translate-y-0.5
+                              {% endif %}">
+                        Get Started
+                        <i class="fas fa-arrow-right ml-2 text-xs"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <!-- Fallback if no plans in DB -->
+        <div class="text-center text-gray-500 py-12">
+            <i class="fas fa-tags text-5xl mb-4 opacity-30"></i>
+            <p>Membership plans coming soon. Contact us for pricing.</p>
+        </div>
+        {% endif %}
+
+        <p class="text-center text-gray-600 text-sm mt-10">
+            All plans include free Wi-Fi, parking, and access to our mobile member portal.
+            <a href="#contact" class="text-blue-400 hover:text-blue-300 ml-1">Questions? Contact us.</a>
+        </p>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════════════ -->
+<section id="testimonials" class="py-24 lg:py-32 bg-gray-900/40 border-y border-white/5 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-16">
+            <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 rounded-full mb-4">Reviews</span>
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-4">
+                Real Results,<br><span class="gradient-text">Real People</span>
+            </h2>
+            <p class="text-gray-400 text-lg max-w-xl mx-auto">Hear from the members who made Olympia their second home.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="relative bg-gray-900/80 border border-white/5 rounded-2xl p-8 card-glow">
+                <span class="quote-mark">"</span>
+                <div class="flex mb-3 mt-4">
+                    {% for i in range(5) %}<i class="fas fa-star text-yellow-400 text-sm mr-0.5"></i>{% endfor %}
+                </div>
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    "I lost 28 lbs in four months. The trainers here actually care about your progress. 
+                    Best investment I've ever made for my health."
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">M</div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Marcus T.</p>
+                        <p class="text-gray-500 text-xs">Member since 2023</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative bg-gray-900/80 border border-white/5 rounded-2xl p-8 card-glow">
+                <span class="quote-mark">"</span>
+                <div class="flex mb-3 mt-4">
+                    {% for i in range(5) %}<i class="fas fa-star text-yellow-400 text-sm mr-0.5"></i>{% endfor %}
+                </div>
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    "The 24/7 access changed everything for me. I work late shifts and now I never 
+                    have to miss a workout. The equipment is always spotless."
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-600 to-cyan-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">S</div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Sofia R.</p>
+                        <p class="text-gray-500 text-xs">Member since 2022</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative bg-gray-900/80 border border-white/5 rounded-2xl p-8 card-glow">
+                <span class="quote-mark">"</span>
+                <div class="flex mb-3 mt-4">
+                    {% for i in range(5) %}<i class="fas fa-star text-yellow-400 text-sm mr-0.5"></i>{% endfor %}
+                </div>
+                <p class="text-gray-300 text-sm leading-relaxed mb-6">
+                    "Group classes here are incredible — the energy is unmatched. I've tried 
+                    a dozen gyms and Olympia is on another level. Worth every penny."
+                </p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-rose-600 to-amber-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0">J</div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">James K.</p>
+                        <p class="text-gray-500 text-xs">Member since 2024</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CTA BANNER
+═══════════════════════════════════════════════════ -->
+<section class="py-24 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-purple-900/80 border border-blue-700/30 p-12 lg:p-16 text-center">
+            <!-- Background grid -->
+            <div class="absolute inset-0 opacity-10"
+                 style="background-image: linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px);
+                        background-size: 40px 40px;"></div>
+            <!-- Glow -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-20"
+                 style="background: radial-gradient(circle, #3b82f6 0%, transparent 70%);"></div>
+
+            <div class="relative z-10">
+                <h2 class="text-4xl lg:text-5xl font-black text-white mb-4">
+                    Ready to Begin?
+                </h2>
+                <p class="text-blue-200/80 text-lg max-w-xl mx-auto mb-10">
+                    Join over 1,200 members who chose to invest in themselves.
+                    Your first step starts right here.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#plans"
+                       class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-blue-900 bg-white hover:bg-blue-50 rounded-xl shadow-2xl transition-all hover:-translate-y-0.5">
+                        <i class="fas fa-dumbbell mr-2.5"></i>
+                        View Membership Plans
+                    </a>
+                    <a href="{{ url_for('login') }}"
+                       class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all hover:-translate-y-0.5">
+                        <i class="fas fa-sign-in-alt mr-2.5"></i>
+                        Member Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CONTACT
+═══════════════════════════════════════════════════ -->
+<section id="contact" class="py-24 bg-gray-900/40 border-t border-white/5 fade-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+            <!-- Left -->
+            <div>
+                <span class="inline-block px-3 py-1 text-xs font-semibold tracking-widest uppercase text-blue-400 bg-blue-950/60 border border-blue-800/40 rounded-full mb-5">Contact</span>
+                <h2 class="text-4xl font-black text-white mb-4">Come Visit <span class="gradient-text">Olympia</span></h2>
+                <p class="text-gray-400 text-lg mb-10">We'd love to show you around. Stop by for a free tour or drop us a message.</p>
+
+                <div class="space-y-5">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Address</p>
+                            <p class="text-gray-400 text-sm">1200 Olympia Drive, Suite 100<br>Los Angeles, CA 90001</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-phone text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Phone</p>
+                            <p class="text-gray-400 text-sm">(213) 555-0198</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-envelope text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Email</p>
+                            <p class="text-gray-400 text-sm">hello@olympiagym.com</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/40 flex-shrink-0 flex items-center justify-center">
+                            <i class="fas fa-clock text-blue-400"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">Hours</p>
+                            <p class="text-gray-400 text-sm">Open 24 hours, 7 days a week</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right — contact form -->
+            <div class="bg-gray-900/80 border border-white/5 rounded-2xl p-8">
+                <h3 class="text-lg font-bold text-white mb-6">Send Us a Message</h3>
+                <form class="space-y-4" onsubmit="handleContactForm(event)">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">First Name</label>
+                            <input type="text" placeholder="John"
+                                   class="w-full bg-gray-800/60 border border-white/10 focus:border-blue-500/60 focus:ring-0 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition-colors">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">Last Name</label>
+                            <input type="text" placeholder="Doe"
+                                   class="w-full bg-gray-800/60 border border-white/10 focus:border-blue-500/60 focus:ring-0 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition-colors">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">Email</label>
+                        <input type="email" placeholder="john@example.com"
+                               class="w-full bg-gray-800/60 border border-white/10 focus:border-blue-500/60 focus:ring-0 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wider">Message</label>
+                        <textarea rows="4" placeholder="I'd like to learn more about membership…"
+                                  class="w-full bg-gray-800/60 border border-white/10 focus:border-blue-500/60 focus:ring-0 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 outline-none transition-colors resize-none"></textarea>
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-blue-900/40">
+                        <i class="fas fa-paper-plane mr-2"></i>
+                        Send Message
+                    </button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="bg-gray-950 border-t border-white/5 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+
+            <!-- Brand -->
+            <div class="md:col-span-2">
+                <a href="#" class="flex items-center space-x-2 mb-4">
+                    <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-900/50">
+                        <i class="fas fa-dumbbell text-white text-base"></i>
+                    </div>
+                    <span class="text-xl font-extrabold tracking-tight">
+                        <span class="text-white">Olympia</span><span class="text-blue-400">Gym</span>
+                    </span>
+                </a>
+                <p class="text-gray-500 text-sm leading-relaxed max-w-xs">
+                    Forge your legend. World-class facilities, expert coaching, and a community that drives results.
+                </p>
+                <div class="flex gap-3 mt-5">
+                    <a href="#" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-instagram text-sm"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-twitter text-sm"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-facebook-f text-sm"></i>
+                    </a>
+                    <a href="#" class="w-9 h-9 rounded-lg bg-white/5 hover:bg-white/10 border border-white/5 flex items-center justify-center text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-youtube text-sm"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick links -->
+            <div>
+                <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
+                <ul class="space-y-2.5">
+                    <li><a href="#features" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Features</a></li>
+                    <li><a href="#plans" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Membership Plans</a></li>
+                    <li><a href="#testimonials" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Testimonials</a></li>
+                    <li><a href="#contact" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <!-- Members -->
+            <div>
+                <h4 class="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Members</h4>
+                <ul class="space-y-2.5">
+                    <li>
+                        <a href="{{ url_for('login') }}" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">
+                            Member Login
+                        </a>
+                    </li>
+                    <li><a href="#contact" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Request a Tour</a></li>
+                    <li><a href="#plans" class="text-gray-500 hover:text-gray-300 text-sm transition-colors">Join Today</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="border-t border-white/5 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p class="text-gray-600 text-sm">&copy; 2026 OlympiaGym. All rights reserved.</p>
+            <div class="flex gap-5 text-xs text-gray-600">
+                <a href="#" class="hover:text-gray-400 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-gray-400 transition-colors">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
+<script>
+    // Scroll fade-in for sections
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-section').forEach(el => observer.observe(el));
+
+    // Contact form — demo handler (no backend endpoint for public form)
+    function handleContactForm(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        btn.innerHTML = '<i class="fas fa-check mr-2"></i>Message Sent!';
+        btn.classList.replace('bg-blue-600', 'bg-emerald-600');
+        btn.classList.replace('hover:bg-blue-500', 'hover:bg-emerald-500');
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+            btn.classList.replace('bg-emerald-600', 'bg-blue-600');
+            btn.classList.replace('hover:bg-emerald-500', 'hover:bg-blue-500');
+            btn.disabled = false;
+            e.target.reset();
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>

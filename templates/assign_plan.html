@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Plan{% endblock %}
+{% block page_title %}Assign Membership Plan{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('members') }}"
+   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+    <i class="fas fa-arrow-left mr-2"></i>Back to Members
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+            <div class="w-9 h-9 rounded-xl bg-orange-100 text-orange-500 flex items-center justify-center">
+                <i class="fas fa-file-signature"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-gray-800">New Subscription</h2>
+                <p class="text-xs text-gray-400">Assign a plan and activate the member</p>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <form action="{{ url_for('assign_plan') }}" method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Member select -->
+                <div>
+                    <label for="member_id" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Select Member <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400 text-sm"></i>
+                        </div>
+                        <select id="member_id" name="member_id" required
+                                class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors bg-white appearance-none">
+                            <option value="" disabled {% if not preselect_member %}selected{% endif %}>— Choose a member —</option>
+                            {% for member in members %}
+                            <option value="{{ member.id }}" {% if preselect_member|string == member.id|string %}selected{% endif %}>
+                                {{ member.name }} (#{{ "%04d"|format(member.id) }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan selection: radio cards -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2.5">
+                        Select Plan <span class="text-red-500">*</span>
+                    </label>
+                    <div class="space-y-2.5">
+                        {% for plan in plans %}
+                        <label class="relative flex cursor-pointer rounded-xl border-2 border-gray-200 bg-white p-4 hover:border-orange-400 hover:bg-orange-50/30 transition-all has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50/50">
+                            <input type="radio" name="plan_id" value="{{ plan.id }}"
+                                   id="plan_{{ plan.id }}" class="sr-only peer" required>
+                            <div class="flex flex-1 items-center gap-3 min-w-0">
+                                <!-- Check indicator -->
+                                <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-orange-500 flex-shrink-0 flex items-center justify-center transition-colors
+                                            [label:has(:checked)_&]:border-orange-500">
+                                    <div class="w-2.5 h-2.5 rounded-full bg-orange-500 hidden [label:has(:checked)_&]:block"></div>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-semibold text-gray-900">{{ plan.name }}</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">
+                                        {{ plan.duration_days }} days access
+                                        {% if plan.description %}&mdash; {{ plan.description }}{% endif %}
+                                    </p>
+                                </div>
+                                <span class="text-base font-bold text-gray-900 flex-shrink-0 ml-2">${{ "%.2f"|format(plan.price) }}</span>
+                            </div>
+                            <!-- Checked border overlay -->
+                            <span class="pointer-events-none absolute -inset-px rounded-xl border-2 border-transparent peer-checked:border-orange-500 transition-colors" aria-hidden="true"></span>
+                        </label>
+                        {% else %}
+                        <div class="p-4 border border-amber-200 rounded-xl bg-amber-50 text-center text-sm text-amber-700">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            No plans available. <a href="{{ url_for('add_plan') }}" class="font-semibold underline hover:text-amber-900">Create a plan first.</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Info note -->
+                <div class="flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl p-4">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5 flex-shrink-0"></i>
+                    <p class="text-sm text-blue-700">
+                        The subscription will start immediately from today's date. The member's status will automatically be set to <strong>Active</strong>.
+                    </p>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                    <a href="{{ url_for('members') }}"
+                       class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            {% if not plans or not members %}disabled{% endif %}>
+                        <i class="fas fa-check mr-2"></i>Assign &amp; Activate
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

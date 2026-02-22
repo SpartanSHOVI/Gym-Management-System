@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Olympia Gym — Management System">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+    <title>{% block title %}Olympia Gym{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#f97316', dark: '#ea6c0a' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        /* Smooth scrollbar for sidebar */
+        aside::-webkit-scrollbar { width: 4px; }
+        aside::-webkit-scrollbar-track { background: transparent; }
+        aside::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-100 flex h-screen overflow-hidden" x-data="{ mobileNavOpen: false }">
+
+    <!-- Mobile overlay backdrop -->
+    <div x-show="mobileNavOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/60 z-20 md:hidden"
+         @click="mobileNavOpen = false"
+         x-cloak></div>
+
+    <!-- ========== SIDEBAR (desktop: static, mobile: slide-in overlay) ========== -->
+    <aside class="w-64 bg-gray-950 text-white flex-col z-30 flex-shrink-0
+                  hidden md:flex
+                  fixed md:static inset-y-0 left-0
+                  transition-transform duration-200"
+           :class="mobileNavOpen ? '!flex' : ''"
+           x-cloak>
+
+        <!-- Brand -->
+        <div class="h-16 flex items-center justify-between px-5 bg-black/40 border-b border-white/5 flex-shrink-0">
+            <a href="{{ url_for('homepage') }}" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center shadow">
+                    <i class="fas fa-dumbbell text-white text-sm"></i>
+                </div>
+                <span class="text-lg font-black tracking-widest text-white uppercase">Olympia</span>
+            </a>
+            <!-- Close button (mobile only) -->
+            <button @click="mobileNavOpen = false"
+                    class="md:hidden text-gray-500 hover:text-white transition-colors p-1"
+                    aria-label="Close navigation">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- User badge -->
+        {% if current_user_id %}
+        <div class="mx-3 mt-4 mb-2 px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 font-bold text-sm flex-shrink-0">
+                {{ current_username[0]|upper }}
+            </div>
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-white truncate">{{ current_username }}</p>
+                <p class="text-xs text-gray-400">{{ current_user_role }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Nav -->
+        <nav class="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
+            {% if current_user_role in ['Admin', 'Owner'] %}
+
+            <a href="{{ url_for('dashboard_dispatch') }}"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      {% if request.endpoint in ['dashboard_dispatch', 'dashboard_admin', 'dashboard_owner'] %}
+                        bg-orange-500 text-white shadow
+                      {% else %}
+                        text-gray-400 hover:bg-white/8 hover:text-white
+                      {% endif %}">
+                <i class="fas fa-chart-pie w-5 text-center text-[0.9rem]"></i>
+                <span class="ml-3">Dashboard</span>
+            </a>
+
+            <div class="pt-5 pb-1.5 px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest">Management</div>
+
+            <a href="{{ url_for('members') }}"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      {% if request.endpoint and 'member' in request.endpoint %}
+                        bg-orange-500 text-white shadow
+                      {% else %}
+                        text-gray-400 hover:bg-white/8 hover:text-white
+                      {% endif %}">
+                <i class="fas fa-users w-5 text-center text-[0.9rem]"></i>
+                <span class="ml-3">Members</span>
+            </a>
+
+            <a href="{{ url_for('plans') }}"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      {% if request.endpoint and 'plan' in request.endpoint and request.endpoint != 'assign_plan' %}
+                        bg-orange-500 text-white shadow
+                      {% else %}
+                        text-gray-400 hover:bg-white/8 hover:text-white
+                      {% endif %}">
+                <i class="fas fa-tags w-5 text-center text-[0.9rem]"></i>
+                <span class="ml-3">Plans</span>
+            </a>
+
+            <a href="{{ url_for('assign_plan') }}"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      {% if request.endpoint == 'assign_plan' %}
+                        bg-orange-500 text-white shadow
+                      {% else %}
+                        text-gray-400 hover:bg-white/8 hover:text-white
+                      {% endif %}">
+                <i class="fas fa-file-signature w-5 text-center text-[0.9rem]"></i>
+                <span class="ml-3">Assign Plan</span>
+            </a>
+
+            <div class="pt-5 pb-1.5 px-3 text-[10px] font-bold text-gray-600 uppercase tracking-widest">System</div>
+
+            <form action="{{ url_for('update_status') }}" method="POST" class="w-full"
+                  onsubmit="return confirm('Sync member statuses based on current subscriptions?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                        class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-white/8 hover:text-white transition-colors"
+                        title="Update Expired Plans">
+                    <i class="fas fa-sync-alt w-5 text-center text-[0.9rem]"></i>
+                    <span class="ml-3">Sync Statuses</span>
+                </button>
+            </form>
+
+            {% elif current_user_role == 'Participant' %}
+
+            <a href="{{ url_for('dashboard_dispatch') }}"
+               class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      {% if request.endpoint in ['dashboard_participant', 'member_detail'] %}
+                        bg-orange-500 text-white shadow
+                      {% else %}
+                        text-gray-400 hover:bg-white/8 hover:text-white
+                      {% endif %}">
+                <i class="fas fa-home w-5 text-center text-[0.9rem]"></i>
+                <span class="ml-3">My Profile</span>
+            </a>
+
+            {% endif %}
+        </nav>
+
+        <!-- Sidebar footer: logout -->
+        {% if current_user_id %}
+        <div class="p-3 border-t border-white/5 flex-shrink-0">
+            <form action="{{ url_for('logout') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit"
+                        class="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-red-500/15 hover:text-red-400 transition-colors">
+                    <i class="fas fa-sign-out-alt w-5 text-center text-[0.9rem]"></i>
+                    <span class="ml-3">Logout</span>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </aside>
+
+    <!-- ========== MAIN CONTENT AREA ========== -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+        <!-- Top Header -->
+        <header class="bg-white border-b border-gray-200 h-14 flex items-center justify-between px-4 md:px-6 z-10 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <!-- Hamburger (mobile) -->
+                <button @click="mobileNavOpen = true"
+                        class="md:hidden text-gray-500 hover:text-gray-800 transition-colors p-1 -ml-1"
+                        aria-label="Open navigation">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <!-- Mobile brand -->
+                <a href="{{ url_for('homepage') }}" class="flex items-center gap-2 md:hidden">
+                    <div class="w-7 h-7 rounded-md bg-orange-500 flex items-center justify-center">
+                        <i class="fas fa-dumbbell text-white text-xs"></i>
+                    </div>
+                    <span class="text-base font-black tracking-widest text-gray-900 uppercase">Olympia</span>
+                </a>
+            </div>
+
+            <!-- Date (desktop) -->
+            <div class="hidden md:flex items-center text-gray-400 text-sm">
+                <i class="far fa-calendar-alt mr-2"></i>
+                <span>{{ server_date }}</span>
+            </div>
+
+            <!-- Right: user info + logout (desktop) -->
+            <div class="flex items-center gap-3">
+                {% if current_user_id %}
+                <span class="hidden sm:flex items-center gap-2 text-sm text-gray-600">
+                    <span class="font-medium text-gray-800">{{ current_username }}</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold
+                        {% if current_user_role == 'Admin' %}bg-red-100 text-red-700
+                        {% elif current_user_role == 'Owner' %}bg-amber-100 text-amber-700
+                        {% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ current_user_role }}
+                    </span>
+                </span>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="text-sm font-medium text-orange-600 hover:text-orange-700">Login</a>
+                {% endif %}
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6 pb-20 md:pb-6">
+
+            <!-- Page header row -->
+            <div class="mb-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">{% block page_title %}Dashboard{% endblock %}</h1>
+                <div class="flex items-center gap-2">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </div>
+
+            <!-- Flash Messages -->
+            <div aria-live="polite" class="mb-5 space-y-2">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                    <div x-data="{ show: true }" x-show="show"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="flex items-center justify-between p-3.5 rounded-xl shadow-sm border text-sm
+                                {% if category == 'error' %}bg-red-50 text-red-800 border-red-200
+                                {% else %}bg-emerald-50 text-emerald-800 border-emerald-200{% endif %}"
+                         role="alert">
+                        <div class="flex items-center gap-3">
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle text-red-500{% else %}fa-check-circle text-emerald-500{% endif %} text-base flex-shrink-0"></i>
+                            <span class="font-medium">{{ message }}</span>
+                        </div>
+                        <button @click="show = false"
+                                class="ml-4 flex-shrink-0 {% if category == 'error' %}text-red-400 hover:text-red-600{% else %}text-emerald-400 hover:text-emerald-600{% endif %} transition-colors"
+                                aria-label="Dismiss">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <!-- Dynamic Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- ========== MOBILE BOTTOM NAV (md+ hidden) ========== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-950 border-t border-white/10 flex items-stretch h-16 safe-bottom"
+         aria-label="Mobile navigation">
+
+        {% if current_user_role in ['Admin', 'Owner'] %}
+
+        <a href="{{ url_for('dashboard_dispatch') }}"
+           class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors
+                  {% if request.endpoint in ['dashboard_dispatch', 'dashboard_admin', 'dashboard_owner'] %}text-orange-400{% else %}text-gray-500 hover:text-gray-300{% endif %}">
+            <i class="fas fa-chart-pie text-lg"></i>
+            <span>Dashboard</span>
+        </a>
+
+        <a href="{{ url_for('members') }}"
+           class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors
+                  {% if request.endpoint and 'member' in request.endpoint %}text-orange-400{% else %}text-gray-500 hover:text-gray-300{% endif %}">
+            <i class="fas fa-users text-lg"></i>
+            <span>Members</span>
+        </a>
+
+        <a href="{{ url_for('plans') }}"
+           class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors
+                  {% if request.endpoint and 'plan' in request.endpoint and request.endpoint != 'assign_plan' %}text-orange-400{% else %}text-gray-500 hover:text-gray-300{% endif %}">
+            <i class="fas fa-tags text-lg"></i>
+            <span>Plans</span>
+        </a>
+
+        <a href="{{ url_for('assign_plan') }}"
+           class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors
+                  {% if request.endpoint == 'assign_plan' %}text-orange-400{% else %}text-gray-500 hover:text-gray-300{% endif %}">
+            <i class="fas fa-file-signature text-lg"></i>
+            <span>Assign</span>
+        </a>
+
+        <form action="{{ url_for('logout') }}" method="POST" class="flex-1">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit"
+                    class="w-full h-full flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium text-gray-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-sign-out-alt text-lg"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+
+        {% elif current_user_role == 'Participant' %}
+
+        <a href="{{ url_for('dashboard_dispatch') }}"
+           class="flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors
+                  {% if request.endpoint in ['dashboard_participant', 'member_detail'] %}text-orange-400{% else %}text-gray-500 hover:text-gray-300{% endif %}">
+            <i class="fas fa-home text-lg"></i>
+            <span>My Profile</span>
+        </a>
+
+        <form action="{{ url_for('logout') }}" method="POST" class="flex-1">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit"
+                    class="w-full h-full flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium text-gray-500 hover:text-red-400 transition-colors">
+                <i class="fas fa-sign-out-alt text-lg"></i>
+                <span>Logout</span>
+            </button>
+        </form>
+
+        {% endif %}
+    </nav>
+
+</body>
+</html>

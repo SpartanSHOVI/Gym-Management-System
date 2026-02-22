@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Member{% endblock %}
+{% block page_title %}Edit Member Details{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('member_detail', id=member.id) }}"
+   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+    <i class="fas fa-arrow-left mr-2"></i>Back to Profile
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+            <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                <i class="fas fa-user-edit"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-gray-800">Update Information</h2>
+                <p class="text-xs text-gray-400">Editing profile for <span class="font-medium text-gray-600">{{ member.name }}</span></p>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <form method="POST" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Name -->
+                <div>
+                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Full Name <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400 text-sm"></i>
+                        </div>
+                        <input type="text" id="name" name="name" value="{{ member.name }}" required maxlength="100"
+                               class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors">
+                    </div>
+                </div>
+
+                <!-- Phone -->
+                <div>
+                    <label for="phone" class="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-phone text-gray-400 text-sm"></i>
+                        </div>
+                        <input type="tel" id="phone" name="phone" value="{{ member.phone or '' }}" maxlength="30"
+                               class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors">
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400 text-sm"></i>
+                        </div>
+                        <input type="email" id="email" name="email" value="{{ member.email or '' }}" maxlength="200"
+                               class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
+                               placeholder="john@example.com">
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div>
+                    <label for="status" class="block text-sm font-semibold text-gray-700 mb-1.5">Account Status</label>
+                    <select id="status" name="status"
+                            class="block w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors bg-white">
+                        <option value="Active" {% if member.status == 'Active' %}selected{% endif %}>Active</option>
+                        <option value="Inactive" {% if member.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                    <p class="mt-1.5 text-xs text-gray-400">Note: Updating status here overrides automatic plan-based status tracking.</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                    <a href="{{ url_for('member_detail', id=member.id) }}"
+                       class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition-colors shadow-sm">
+                        <i class="fas fa-save mr-2"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

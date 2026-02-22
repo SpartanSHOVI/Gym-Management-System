@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Plan{% endblock %}
+{% block page_title %}{{ action }} Membership Plan{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('plans') }}"
+   class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+    <i class="fas fa-arrow-left mr-2"></i>Back to Plans
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-3 bg-gray-50">
+            <div class="w-9 h-9 rounded-xl bg-orange-100 text-orange-500 flex items-center justify-center">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-bold text-gray-800">Plan Details</h2>
+                <p class="text-xs text-gray-400">{{ 'Update existing plan' if action == 'Edit' else 'Create a new membership plan' }}</p>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <form method="POST" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Plan Name -->
+                <div>
+                    <label for="name" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Plan Name <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-signature text-gray-400 text-sm"></i>
+                        </div>
+                        <input type="text" id="name" name="name"
+                               value="{{ plan.name if plan else '' }}"
+                               required maxlength="100"
+                               class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
+                               placeholder="e.g. Monthly Premium">
+                    </div>
+                </div>
+
+                <!-- Price + Duration: side-by-side on sm+, stacked on mobile -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                        <label for="price" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Price (USD) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <span class="text-gray-400 text-sm font-medium">$</span>
+                            </div>
+                            <input type="number" step="0.01" min="0" id="price" name="price"
+                                   value="{{ plan.price if plan else '' }}" required
+                                   class="block w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+                    <div>
+                        <label for="duration_days" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                            Duration (Days) <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar-alt text-gray-400 text-sm"></i>
+                            </div>
+                            <input type="number" min="1" id="duration_days" name="duration_days"
+                                   value="{{ plan.duration_days if plan else '' }}" required
+                                   class="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors"
+                                   placeholder="e.g. 30">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Description <span class="text-xs font-normal text-gray-400">(optional)</span>
+                    </label>
+                    <textarea id="description" name="description" rows="3" maxlength="500"
+                              class="block w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition-colors resize-none"
+                              placeholder="Brief description of what this plan includes…">{{ plan.description if plan and plan.description else '' }}</textarea>
+                    <p class="mt-1 text-xs text-gray-400">Max 500 characters</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                    <a href="{{ url_for('plans') }}"
+                       class="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 focus:ring-2 focus:ring-orange-400 focus:ring-offset-2 transition-colors shadow-sm">
+                        <i class="fas fa-save mr-2"></i>
+                        {% if action == 'Edit' %}Update Plan{% else %}Create Plan{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

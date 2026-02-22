@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Olympia Gym — Sign In">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+    <title>Sign In — Olympia Gym</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        [x-cloak] { display: none !important; }
+        .hero-bg {
+            background-image: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        }
+        .input-field {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #f1f5f9;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .input-field::placeholder { color: #4b5563; }
+        .input-field:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.15);
+        }
+        .input-icon { color: #6b7280; }
+        .input-field:focus + .input-icon,
+        .input-icon-wrap:focus-within .input-icon { color: #f97316; }
+    </style>
+</head>
+<body class="hero-bg min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+
+        <!-- Card -->
+        <div class="bg-gray-900 rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+
+            <!-- Card header -->
+            <div class="px-8 pt-8 pb-6 text-center border-b border-white/5">
+                <a href="{{ url_for('homepage') }}" class="inline-flex items-center gap-3 mb-6 group">
+                    <div class="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg group-hover:bg-orange-400 transition-colors">
+                        <i class="fas fa-dumbbell text-white text-base"></i>
+                    </div>
+                    <span class="text-2xl font-black tracking-widest text-white uppercase">Olympia</span>
+                </a>
+                <h1 class="text-xl font-bold text-white">Welcome back</h1>
+                <p class="text-sm text-gray-400 mt-1">Sign in to your account to continue</p>
+            </div>
+
+            <!-- Flash messages -->
+            <div aria-live="polite" class="px-8 pt-5 space-y-2">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                    <div x-data="{ show: true }" x-show="show" x-transition
+                         class="flex items-center justify-between p-3 rounded-lg text-sm border
+                                {% if category == 'error' %}bg-red-500/10 text-red-300 border-red-500/20
+                                {% else %}bg-emerald-500/10 text-emerald-300 border-emerald-500/20{% endif %}"
+                         role="alert">
+                        <div class="flex items-center gap-2">
+                            <i class="fas {% if category == 'error' %}fa-exclamation-circle text-red-400{% else %}fa-check-circle text-emerald-400{% endif %}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button @click="show = false" class="ml-3 text-gray-500 hover:text-gray-300 transition-colors" aria-label="Dismiss">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+
+            <!-- Form -->
+            <form action="{{ url_for('login') }}" method="POST" class="px-8 py-6 space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <!-- Username -->
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-300 mb-1.5">Username</label>
+                    <div class="relative input-icon-wrap">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-sm input-icon transition-colors"></i>
+                        </div>
+                        <input type="text" name="username" id="username" required autocomplete="username"
+                               class="input-field block w-full pl-10 pr-4 py-2.5 rounded-lg text-sm"
+                               placeholder="Enter your username">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div x-data="{ showPw: false }">
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1.5">Password</label>
+                    <div class="relative input-icon-wrap">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-sm input-icon transition-colors"></i>
+                        </div>
+                        <input :type="showPw ? 'text' : 'password'"
+                               name="password" id="password" required autocomplete="current-password"
+                               class="input-field block w-full pl-10 pr-10 py-2.5 rounded-lg text-sm"
+                               placeholder="••••••••">
+                        <button type="button" @click="showPw = !showPw"
+                                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                                :aria-label="showPw ? 'Hide password' : 'Show password'">
+                            <i :class="showPw ? 'fa-eye-slash' : 'fa-eye'" class="fas text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit"
+                        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-orange-500 hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors shadow-lg shadow-orange-500/20">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <!-- Footer -->
+            <div class="px-8 pb-6 text-center">
+                <a href="{{ url_for('homepage') }}" class="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to homepage
+                </a>
+            </div>
+        </div>
+
+        <!-- Sub-text -->
+        <p class="text-center text-xs text-gray-700 mt-6">Olympia Gym Management System &mdash; Members only</p>
+    </div>
+
+</body>
+</html>
